@@ -1,0 +1,46 @@
+# River Gateway with Docker Compose.
+#
+#   docker compose up -d --build     build and start (http://127.0.0.1:8080/ui/)
+#   docker compose logs -f           follow the logs
+#   docker compose exec gateway river-gateway keys create --name my-app
+#   docker compose down              stop (the data volume is kept)
+#
+# Needs .env (RIVER_API_KEY, GATEWAY_ADMIN_TOKEN) and config.yaml next to this
+# file: copy them from .env.example and config.example.yaml first.
+# Server deployment: see DEPLOY.md.
+
+# A fixed project name keeps the data volume named river-gateway_gateway-data
+# whatever directory the project sits in.
+name: river-gateway
+
+services:
+  gateway:
+    build:
+      context: .
+      args:
+        # PyPI index used while building the image. Where pypi.org is slow or
+        # blocked, set PIP_INDEX_URL in .env, e.g. https://pypi.tuna.tsinghua.edu.cn/simple
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+    image: river-gateway:latest
+    container_name: river-gateway
+    restart: unless-stopped
+    env_file: .env
+    extra_hosts:
+      # Lets HTTPS_PROXY in .env point at a proxy on the host: http://host.docker.internal:<port>
+      - "host.docker.internal:host-gateway"
+    environment:
+      # Time zone for log timestamps and `river-gateway usage --by day`.
+      # CST-8 is UTC+8 (China Standard Time); change it if you are elsewhere.
+      TZ: CST-8
+    ports:
+      # Reachable from this computer only. To serve your LAN, drop "127.0.0.1:"
+      # and set a strong GATEWAY_ADMIN_TOKEN first.
+      - "127.0.0.1:8080:8080"
+    volumes:
+      # Routes, limits, upstreams. After editing: docker compose restart
+      - ./config.yaml:/app/config.yaml:ro
+      # Keys and usage log (SQLite). A named volume survives `docker compose down`.
+      - gateway-data:/app/data
+
+volumes:
+  gateway-data:

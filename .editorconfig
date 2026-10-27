@@ -1,0 +1,7 @@
+# The gateway runs on Linux: keep LF line endings (shell scripts break with CRLF).
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true

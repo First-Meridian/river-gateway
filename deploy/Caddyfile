@@ -1,0 +1,27 @@
+# Caddy reverse proxy for River Gateway: automatic HTTPS (Let's Encrypt).
+# Install as /etc/caddy/Caddyfile, replace gateway.example.com with your domain,
+# then: systemctl reload caddy. See DEPLOY.md, step 8B.
+
+gateway.example.com {
+	# Prometheus metrics are unauthenticated: keep them off the internet.
+	@metrics path /metrics
+	respond @metrics 404
+
+	# Optional, recommended: only your own IP may open the console, the admin
+	# API and the API docs. Uncomment and put your public IP (several are allowed).
+	# @console {
+	# 	path /ui* /admin* /docs* /redoc* /openapi.json
+	# 	not remote_ip 203.0.113.7
+	# }
+	# respond @console 403
+
+	reverse_proxy 127.0.0.1:8080 {
+		# Pass streamed (SSE) answers through as they arrive.
+		flush_interval -1
+		transport http {
+			# River: prefill up to 10 minutes, non-streaming answers up to 15.
+			response_header_timeout 11m
+			read_timeout 16m
+		}
+	}
+}

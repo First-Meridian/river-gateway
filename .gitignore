@@ -1,0 +1,46 @@
+# ---- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# ---- Tool caches ---------------------------------------------------------------
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ---- Secrets: never commit (.env.example is the template) ----------------------
+.env
+.env.*
+!.env.example
+
+# ---- Local config and runtime data (config.example.yaml is the template) -------
+/config.yaml
+/data/
+*.db
+*.db-wal
+*.db-shm
+*.db.partial
+
+# ---- Database backups: they contain River API keys ------------------------------
+/backups/
+backup.log
+
+# ---- Deployment archives (DEPLOY.md, step 4.1) ----------------------------------
+*.tar.gz
+
+# ---- Machine-specific editor and Claude Code settings ---------------------------
+.claude/launch.json
+.claude/settings.local.json
+.vscode/
+.idea/
+
+# ---- OS clutter -----------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
